@@ -2,6 +2,7 @@ package main
 
 import (
 	"footballanalyticshub/internal/db"
+	"footballanalyticshub/internal/db/seed"
 	"log"
 	"net/http"
 
@@ -10,6 +11,10 @@ import (
 
 func main() {
 	database, err := db.Connect()
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = seed.Run(database)
 	if err != nil {
 		log.Fatal(err)
 	}
