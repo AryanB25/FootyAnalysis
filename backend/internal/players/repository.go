@@ -14,8 +14,19 @@ func NewPlayerRepository(db *sql.DB) *Repository {
 	}
 }
 
-func (r *Repository) GetAllPlayers() ([]Player, error) {
-	rows, err := r.db.Query("SELECT player_id, short_name, long_name, age, nationality_name, club_name, league_name, club_position, height_cm, weight_kg, preferred_foot, value_eur, wage_eur, overall, potential, international_reputation, pace, shooting, passing, dribbling, defending, physic FROM players")
+func (r *Repository) GetAllPlayers(page int, limit int, min_rating int, max_rating int) ([]Player, error) {
+	offset := (page - 1) * limit
+	var rows *sql.Rows
+	var err error
+	if min_rating > 0 && max_rating > 0 {
+		rows, err = r.db.Query("SELECT player_id, short_name, long_name, age, nationality_name, club_name, league_name, club_position, height_cm, weight_kg, preferred_foot, value_eur, wage_eur, overall, potential, international_reputation, pace, shooting, passing, dribbling, defending, physic FROM players WHERE overall >= $1 AND overall <= $2 LIMIT $3 OFFSET $4", min_rating, max_rating, limit, offset)
+	} else if min_rating > 0 && max_rating == 0 {
+		rows, err = r.db.Query("SELECT player_id, short_name, long_name, age, nationality_name, club_name, league_name, club_position, height_cm, weight_kg, preferred_foot, value_eur, wage_eur, overall, potential, international_reputation, pace, shooting, passing, dribbling, defending, physic FROM players WHERE overall >= $1 LIMIT $2 OFFSET $3", min_rating, limit, offset)
+	} else if min_rating == 0 && max_rating > 0 {
+		rows, err = r.db.Query("SELECT player_id, short_name, long_name, age, nationality_name, club_name, league_name, club_position, height_cm, weight_kg, preferred_foot, value_eur, wage_eur, overall, potential, international_reputation, pace, shooting, passing, dribbling, defending, physic FROM players WHERE overall <= $1 LIMIT $2 OFFSET $3", max_rating, limit, offset)
+	} else {
+		rows, err = r.db.Query("SELECT player_id, short_name, long_name, age, nationality_name, club_name, league_name, club_position, height_cm, weight_kg, preferred_foot, value_eur, wage_eur, overall, potential, international_reputation, pace, shooting, passing, dribbling, defending, physic FROM players LIMIT $1 OFFSET $2", limit, offset)
+	}
 	if err != nil {
 		return nil, err
 	}
