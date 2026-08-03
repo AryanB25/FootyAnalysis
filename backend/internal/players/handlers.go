@@ -17,7 +17,17 @@ func NewPlayerHandlers(repository *Repository) *Handlers {
 }
 
 func (h *Handlers) GetPlayers(c *gin.Context) {
-	players, err := h.repository.GetAllPlayers()
+	page, err := strconv.Atoi(c.Query("page"))
+	if err != nil {
+		page = 1
+	}
+	limit, err := strconv.Atoi(c.Query("limit"))
+	if err != nil {
+		limit = 20
+	}
+	min_rating, err := strconv.Atoi(c.Query("min_rating"))
+	max_rating, err := strconv.Atoi(c.Query("max_rating"))
+	players, err := h.repository.GetAllPlayers(page, limit, min_rating, max_rating)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
