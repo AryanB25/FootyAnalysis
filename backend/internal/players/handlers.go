@@ -57,3 +57,31 @@ func (h *Handlers) SearchPlayers(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, players)
 }
+
+func (h *Handlers) ComparePlayers(c *gin.Context) {
+	idPlayer1, err := strconv.Atoi(c.Query("id1"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	player1, err := h.repository.GetPlayerByID(idPlayer1)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	idPlayer2, err := strconv.Atoi(c.Query("id2"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	player2, err := h.repository.GetPlayerByID(idPlayer2)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	convertedPlayer1 := convertToComparisonStats(player1)
+	convertedPlayer2 := convertToComparisonStats(player2)
+
+	c.JSON(http.StatusOK, PlayerComparison{Player1: convertedPlayer1, Player2: convertedPlayer2})
+}
