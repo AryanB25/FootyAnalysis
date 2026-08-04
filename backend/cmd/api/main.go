@@ -27,6 +27,7 @@ func main() {
 	router.GET("/players/search", handler.SearchPlayers)
 	router.GET("/players/:id", handler.GetPlayerByID)
 	router.GET("/players", handler.GetPlayers)
+	router.GET("/compare", handler.ComparePlayers)
 	router.Run("localhost:8080")
 }
 
