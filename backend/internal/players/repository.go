@@ -63,6 +63,9 @@ func (r *Repository) GetAllPlayers(page int, limit int, min_rating int, max_rati
 		}
 		players = append(players, player)
 	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
 	return players, nil
 }
 
@@ -136,6 +139,9 @@ func (r *Repository) SearchPlayers(name string) ([]Player, error) {
 			return nil, err
 		}
 		players = append(players, player)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
 	}
 	return players, nil
 }
